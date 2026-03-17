@@ -1,6 +1,6 @@
 # 01 – Getting Started
 
-This guide explains what the SPD SC Analytics App is, what you need before you start, and why some things work differently than a typical web app.
+This guide explains what the SPD Marketplace App is, what you need before you start, and why some things work differently than a typical web app.
 
 ---
 
@@ -16,7 +16,7 @@ Before you begin, make sure you have:
 
 ## What is this app?
 
-The **SPD SC Analytics App** is a **Sitecore Marketplace app** that runs inside **XM Cloud**. It provides:
+The **SPD Marketplace App** is a **Sitecore Marketplace app** that runs inside **XM Cloud**. It provides:
 
 - A **content analytics dashboard** – Total items, items updated today, etc.
 - A **dashboard widget** – A compact card for the Portal dashboard

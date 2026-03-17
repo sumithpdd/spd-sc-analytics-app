@@ -14,7 +14,7 @@ Before your app can appear in the Sitecore Cloud Portal, you must register it in
 
 ## Step 2: Basic info
 
-- **Name:** e.g. "SPD SC Analytics App"
+- **Name:** e.g. "SPD Marketplace App"
 - **Description:** Short description of what the app does (optional but helpful)
 
 ---
@@ -59,7 +59,7 @@ The Routing value is the path in your Next.js app. Each `app/<folder>/page.tsx` 
 
 Click **Select APIs** and enable:
 
-- **Authoring and Management GraphQL API** – Required for content queries (e.g. search, item by path). Without this, GraphQL returns no data and you'll see "Total Items = 0".
+- **Authoring and Management GraphQL API** – Required for content queries (e.g. search, item by path) and the Word document import feature. Without this, GraphQL returns no data and you'll see "Total Items = 0".
 - **SitecoreAI APIs** – Enable if your app uses AI features.
 
 ![API access configuration](./assets/api-access-config.png)

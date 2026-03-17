@@ -9,7 +9,7 @@ This guide walks you through creating the Next.js project from scratch and insta
 Run the official Next.js scaffolding tool:
 
 ```bash
-npx create-next-app@latest spd-sc-analytics-app
+npx create-next-app@latest spd-sc-marketplace-app
 ```
 
 When prompted, choose:
@@ -30,7 +30,7 @@ This creates a standard Next.js 14+ app with the App Router. See the [Next.js in
 Change into the project directory and add the SDK packages:
 
 ```bash
-cd spd-sc-analytics-app
+cd spd-sc-marketplace-app
 npm install @sitecore-marketplace-sdk/client @sitecore-marketplace-sdk/xmc
 ```
 

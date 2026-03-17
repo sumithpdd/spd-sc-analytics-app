@@ -1,0 +1,5 @@
+{
+  "endpoints": {},
+  "$schema": "./schemas/UserConfiguration.schema.json",
+  "defaultEndpoint": "default"
+}

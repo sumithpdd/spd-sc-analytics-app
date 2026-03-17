@@ -1,4 +1,4 @@
-# SPD SC Analytics App – Documentation
+# SPD Marketplace App – Documentation
 
 This documentation is written for **junior developers** new to Sitecore Marketplace apps. Each section includes detailed explanations, step-by-step instructions, and links to official resources.
 
@@ -28,14 +28,14 @@ Then [register the app](#register-in-xm-cloud) in Developer Studio. **Important:
 Before the app can appear in the Portal, you must register it in **Developer Studio**:
 
 1. Go to **Developer Studio** → **Create** → **Custom App**
-2. **Basic info:** Enter a name (e.g. "SPD SC Analytics App") and description
+2. **Basic info:** Enter a name (e.g. "SPD Marketplace App") and description
 3. **Deployment URL:** Use `http://localhost:3000` — the **base URL only**. Do not include `/standalone` or any path. Sitecore appends the extension route automatically (e.g. `/standalone`, `/pages-contextpanel`).
 4. **Extension points:** Enable each extension and set the **Routing** value:
    - **Standalone:** `/standalone`
    - **Page context panel:** `/pages-contextpanel` (required for site-specific content data)
    - **Dashboard widgets:** `/dashboard-widget`
    - **Custom field:** `/custom-field`
-5. **API Access:** Click **Select APIs** → enable **Authoring and Management GraphQL API** (and any SitecoreAI APIs if you use them). Without this, GraphQL queries return no data.
+5. **API Access:** Click **Select APIs** → enable **Authoring and Management GraphQL API** (and any SitecoreAI APIs if you use them). Required for content queries. **Note:** The Word import uses a server-side OAuth2 Automation client (see [08 – Word Import](./08-word-import.md)), not Developer Studio API access.
 6. **Save** → **Activate** → **Install** from My Apps
 
 ![Extension points configuration](./assets/extension-points-config.png)
@@ -48,11 +48,29 @@ Before the app can appear in the Portal, you must register it in **Developer Stu
 | Path | Purpose |
 |------|---------|
 | `app/standalone/` | Full-page analytics dashboard (runs from Portal navigation) |
-| `app/pages-contextpanel/` | Site-specific analytics panel (runs inside Pages editor) |
+| `app/pages-contextpanel/` | Site-specific analytics + Word import (runs inside Pages editor) |
+| `app/import-doc/` | Standalone Word document import page (optional) |
 | `app/dashboard-widget/` | Compact dashboard card widget |
 | `app/custom-field/` | Color picker custom field (`getValue` / `setValue`) |
+| `components/ArticleUploader.tsx` | Word document upload → ArticlePage creation |
 | `hooks/useMarketplaceClient.ts` | SDK initialization hook (singleton) |
 | `lib/xmcClient.ts` | GraphQL helpers (`executeGraphQL`, `searchByContentRoot`) |
+| `lib/document-processor.ts` | Word OOXML parsing |
+| `lib/article-document-processor.ts` | Extracts title, date, content, author |
+| `lib/sitecore-constants.ts` | Template IDs, item paths, field names |
+
+---
+
+## Authentication approach
+
+The app uses two authentication mechanisms:
+
+| Feature | Auth method | Where credentials come from |
+|---------|-------------|-----------------------------|
+| **Content analytics, dashboard, custom field** | Marketplace SDK (session-based) | User's Portal session – no config needed |
+| **Word document import** | OAuth2 client credentials | XM Cloud Deploy → Credentials → Automation client |
+
+For the Word import, we use a **server-side API route** (`/api/create-article`) that calls the Sitecore Authoring GraphQL API directly. This requires an **Automation client** created in XM Cloud Deploy (not Developer Studio). See [08 – Word Import](./08-word-import.md) for the full setup.
 
 ---
 
@@ -78,6 +96,7 @@ For a deeper walkthrough, follow these guides in order:
 - [05 – Register App](./05-register-app.md) – Registering and configuring the app in Developer Studio
 - [06 – Project Structure](./06-project-structure.md) – Code layout and key files
 - [07 – Zero Data](./07-troubleshooting-zero-data.md) – Why Total Items = 0 and how to fix it
+- [08 – Word Import](./08-word-import.md) – Import Word documents and create articles in Sitecore
 
 ---
 
@@ -87,3 +106,4 @@ For a deeper walkthrough, follow these guides in order:
 - [Marketplace SDK Quick Start (Manual)](https://doc.sitecore.com/mp/en/developers/sdk/latest/sitecore-marketplace-sdk/quick-start--manual-.html) – Manual initialization
 - [Marketplace Starter Kit](https://github.com/Sitecore/marketplace-starter) – Preconfigured Next.js starter
 - [XM Cloud Developer Docs](https://doc.sitecore.com/ch/en/developers/latest/cloud-dev/get-started-1523436.html) – XM Cloud overview
+- [FMC-ORG/xmc-marketplace](https://github.com/FMC-ORG/xmc-marketplace) – Word import reference implementation

@@ -50,7 +50,6 @@ export function useMarketplaceClient(): MarketplaceClientState {
         isLoading: false,
         isInitialized: true,
       });
-      console.log("Marketplace SDK initialized");
     } catch (error) {
       const err = error instanceof Error ? error : new Error(String(error));
       console.error("SDK initialization failed:", err);

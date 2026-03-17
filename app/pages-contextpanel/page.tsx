@@ -7,6 +7,7 @@
  */
 import { useMarketplaceClient } from "@/hooks/useMarketplaceClient";
 import { getContentRootFromPagePath, searchByContentRoot } from "@/lib/xmcClient";
+import { ArticleUploader } from "@/components/ArticleUploader";
 import type { PagesContext } from "@sitecore-marketplace-sdk/client";
 import { useEffect, useState } from "react";
 
@@ -100,7 +101,7 @@ export default function PagesContextPanel() {
   }
 
   return (
-    <div className="p-4 space-y-4">
+    <div className="p-4 space-y-6">
       <div>
         <h3 className="font-semibold text-gray-900">Content Analytics</h3>
         <p className="text-xs text-gray-500 mt-1">
@@ -134,6 +135,10 @@ export default function PagesContextPanel() {
           </p>
         </div>
       )}
+
+      <div className="border-t border-gray-200 pt-4">
+        <ArticleUploader />
+      </div>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-# SPD SC Analytics App
+# SPD Marketplace App
 
 A Sitecore Marketplace app that provides a Content Analytics Dashboard for Sitecore XM Cloud. Built with Next.js and the [Sitecore Marketplace SDK](https://doc.sitecore.com/mp/en/developers/sdk/latest/sitecore-marketplace-sdk/sitecore-marketplace-sdk-for-javascript.html).
 

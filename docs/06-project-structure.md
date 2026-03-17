@@ -7,7 +7,7 @@ This guide explains the codebase layout and what each key file does. It's aimed 
 ## Directory overview
 
 ```
-spd-sc-analytics-app/
+spd-sc-marketplace-app/
 ├── app/
 │   ├── standalone/           # Full-page dashboard
 │   │   └── page.tsx
@@ -38,7 +38,7 @@ Full-page analytics dashboard. Runs when the user opens the app from the Portal 
 
 ### app/pages-contextpanel/page.tsx
 
-Site-specific analytics panel. Runs **inside the Pages editor** when the user is editing a page. Subscribes to `pages.context` to get `siteInfo.collectionId` (used as `sitecoreContextId`) and `pageInfo.path`. Derives the content root from the page path and calls `searchByContentRoot` to get item counts. This is the extension that typically shows real content data because it has site context.
+Site-specific analytics panel and **Word document import**. Runs **inside the Pages editor** when the user is editing a page. Subscribes to `pages.context` to get `siteInfo.collectionId` (used as `sitecoreContextId`) and `pageInfo.path`. Derives the content root from the page path and calls `searchByContentRoot` to get item counts. Includes `ArticleUploader` for importing Word docs and creating ArticlePage items. See [08 – Word Import](./08-word-import.md).
 
 ### app/dashboard-widget/page.tsx
 
@@ -55,6 +55,26 @@ Color picker custom field. Uses `client.getValue()` to read the current value an
 ### hooks/useMarketplaceClient.ts
 
 React hook that initializes the Marketplace SDK and returns `{ client, error, isLoading, isInitialized }`. Uses a singleton so the client is created once. Calls `ClientSDK.init({ target: window.parent, modules: [XMC] })`. All extension pages use this hook.
+
+### app/import-doc/page.tsx
+
+Standalone Word document import page. Can be used when the app is opened from the main Portal. Tries to get `sitecoreContextId` from `application.context` or `pages.context`. For best results, use the import from the Pages Context Panel instead.
+
+### components/ArticleUploader.tsx
+
+Word document upload UI. Accepts .doc, .docx, .docm, .dotm files. Extracts title, date, content, author and creates ArticlePage items in Sitecore. Used in the Pages Context Panel and the import-doc page.
+
+### lib/document-processor.ts
+
+Parses Word OOXML files. Extracts table rows and paragraphs from `word/document.xml` and returns `string[][]`.
+
+### lib/article-document-processor.ts
+
+Transforms parsed rows into title, date, content, author. Expects: first line = title, second = date (optional), body until "Author" = content, then author name and role.
+
+### lib/article-page-creator.ts
+
+Creates ArticlePage items via `xmc.authoring.graphql`. Uses template `{412BF445-B1A6-4AFF-8054-0B21A1FEBC47}` and parent `/sitecore/content/industry-verticals/legal/Home/Articles`.
 
 ### lib/xmcClient.ts
 
