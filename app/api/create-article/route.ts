@@ -115,7 +115,7 @@ async function resolveOrCreateAuthor(
   // ── 2. Get Author template ID (from env, existing authors, or constants) ───
   const authorTemplateId = getAuthorTemplateId(
     children
-      .filter((c) => c.templateId)
+      .filter((c): c is ChildNode & { templateId: string } => !!c.templateId)
       .map((c) => ({ templateId: c.templateId }))
   );
 
