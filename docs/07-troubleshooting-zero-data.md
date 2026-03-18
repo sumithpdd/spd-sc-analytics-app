@@ -1,16 +1,21 @@
 # 07 – Troubleshooting: Zero Data
 
-If your app shows **Total Items = 0** or "No content found" even though you have content in XM Cloud, this guide explains the causes and how to fix them.
+If your app shows **Total Items = 0** or stats fail to load, this guide explains the causes and how to fix them.
+
+---
+
+## Current approach: server-side Authoring API
+
+The **Content Analytics** (Total Items, Updated Today) in the Pages Context Panel now uses `/api/content-stats`, which calls the Sitecore Authoring GraphQL API with OAuth2. It does **not** require Content/Preview API access in Developer Studio. It uses the same credentials as the Word import (see [08 – Word Import](./08-word-import.md)).
+
+Stats show the article count in the Articles folder (`ARTICLES_FOLDER_ID` in `.env.local`).
 
 ---
 
 ## Why you might see zero data
 
-There are three main reasons:
-
-1. **Missing site context** – The extension you're using doesn't receive `sitecoreContextId`, so GraphQL queries run without site scope and return nothing.
-2. **API Access not enabled** – The app doesn't have permission to call the GraphQL API.
-3. **GraphQL search expects a GUID** – The `search` API's `_path` filter requires a GUID, not a path string. Using a path directly returns no results.
+1. **Missing credentials** – `SITECORE_CLIENT_ID`, `SITECORE_CLIENT_SECRET`, or `ARTICLES_FOLDER_ID` not set in `.env.local`.
+2. **Wrong Articles folder ID** – The GUID in `ARTICLES_FOLDER_ID` doesn't match your Articles folder.
 
 ---
 
@@ -33,62 +38,33 @@ To use it:
 
 ---
 
-## Fix 2: Enable API Access
+## Fix 2: Configure credentials
 
-**Problem:** The app is registered but doesn't have permission to call the Authoring and Management GraphQL API. Queries fail or return empty results.
+**Problem:** Stats fail with "Missing SITECORE_CLIENT_ID", "Auth token request failed", or "ARTICLES_FOLDER_ID not configured".
 
-**Solution:**
+**Solution:** Ensure `.env.local` has the same values as for the Word import:
 
-1. Go to **Developer Studio** → your app
-2. Open the **API Access** section
-3. Click **Select APIs**
-4. Enable **Authoring and Management GraphQL API** (and any SitecoreAI APIs you need)
-5. Save and ensure the app is Active
+- `SITECORE_CLIENT_ID` and `SITECORE_CLIENT_SECRET` from XM Cloud Deploy → Credentials → Automation
+- `XMC_HOST` – your CM hostname
+- `ARTICLES_FOLDER_ID` – Item ID of the Articles folder (Content Editor → Articles item → Quick Info)
 
-See [05 – Register App](./05-register-app.md) for screenshots and step-by-step instructions.
-
----
-
-## Fix 3: Use GUID for search, not path
-
-**Problem:** The GraphQL `search` API's `_path` filter expects a **GUID** (e.g. `{110D559F-DEA5-42EA-9C1C-8A5DF7E70EF9}`), not a path string like `/sitecore/content/MySite/Home`. If you pass a path, the search returns no results.
-
-**Solution:** The `searchByContentRoot` function in `lib/xmcClient.ts` handles this:
-
-1. **Step 1:** Call `item(path: $path)` to fetch the root item by path. This returns the item's `id` (GUID).
-2. **Step 2:** Use that GUID in the `search` query: `where: { name: "_path", value: $guid, operator: CONTAINS }`.
-
-If you write your own search, follow the same pattern: get the item by path first, then search by its ID.
-
----
-
-## How content root is derived
-
-The Pages Context Panel derives the content root from `pageInfo.path`. For example:
-
-- Page path: `/sitecore/content/industry-verticals/visitlondon/Home/SomePage`
-- Content root: `/sitecore/content/industry-verticals/visitlondon/Home` (first 5 segments)
-
-The structure is typically: `/sitecore/content/<tenant>/<site>/<startItem>/...`. The content root is the start item (e.g. `Home`). The `getContentRootFromPagePath` function in `lib/xmcClient.ts` implements this logic.
-
-If your site structure is different, you may need to adjust the logic. You can also use `siteInfo.startItemId` if the context provides it.
+Restart the dev server after changing `.env.local`. See [08 – Word Import](./08-word-import.md) for full setup.
 
 ---
 
 ## Verifying the setup
 
-1. **Check API Access** – In Developer Studio, confirm Authoring and Management GraphQL API is enabled.
-2. **Check context** – In the Pages Context Panel, open the browser console. Log `pagesContext` to see if `siteInfo.collectionId` and `pageInfo.path` are present.
-3. **Check path** – In Content Editor, verify the path of your site's start item matches what the app expects (e.g. `/sitecore/content/.../Home`).
-4. **Use tryItemByPath** – Call `tryItemByPath(client, yourPath, collectionId)` to verify the item exists and the path format is correct.
+1. **Check credentials** – Ensure `.env.local` has `SITECORE_CLIENT_ID`, `SITECORE_CLIENT_SECRET`, `XMC_HOST`, and `ARTICLES_FOLDER_ID`.
+2. **Test the API** – Open `http://localhost:3000/api/content-stats` in your browser. You should see `{"totalItems":N,"updatedToday":0}`.
+3. **Check context** – In the Pages Context Panel, the site name and path come from `pages.context` (SDK). Stats come from the server-side API.
 
 ---
 
 ## Further reading
 
 - [04 – Extension Points](./04-extension-points.md) – When each extension has context
-- [05 – Register App](./05-register-app.md) – API Access configuration
-- [lib/xmcClient.ts](../lib/xmcClient.ts) – Implementation of `searchByContentRoot` and `getContentRootFromPagePath`
+- [05 – Register App](./05-register-app.md) – App registration
+- [08 – Word Import](./08-word-import.md) – Credentials setup (same as content stats)
 
 ---
 

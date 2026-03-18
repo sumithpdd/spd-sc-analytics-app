@@ -118,7 +118,6 @@ export async function searchByContentRoot(
         results {
           id
           name
-          updated
           url { path }
         }
       }

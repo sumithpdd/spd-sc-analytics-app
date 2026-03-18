@@ -35,7 +35,7 @@ Before the app can appear in the Portal, you must register it in **Developer Stu
    - **Page context panel:** `/pages-contextpanel` (required for site-specific content data)
    - **Dashboard widgets:** `/dashboard-widget`
    - **Custom field:** `/custom-field`
-5. **API Access:** Click **Select APIs** → enable **Authoring and Management GraphQL API** (and any SitecoreAI APIs if you use them). Required for content queries. **Note:** The Word import uses a server-side OAuth2 Automation client (see [08 – Word Import](./08-word-import.md)), not Developer Studio API access.
+5. **API Access:** Click **Select APIs** → enable **Content/Preview API** (for content analytics) and **Authoring and Management GraphQL API**. The Word import uses a server-side OAuth2 Automation client (see [08 – Word Import](./08-word-import.md)), but the content analytics needs Preview API access.
 6. **Save** → **Activate** → **Install** from My Apps
 
 ![Extension points configuration](./assets/extension-points-config.png)
@@ -67,10 +67,11 @@ The app uses two authentication mechanisms:
 
 | Feature | Auth method | Where credentials come from |
 |---------|-------------|-----------------------------|
-| **Content analytics, dashboard, custom field** | Marketplace SDK (session-based) | User's Portal session – no config needed |
-| **Word document import** | OAuth2 client credentials | XM Cloud Deploy → Credentials → Automation client |
+| **Content analytics** (Total Items, etc.) | Server-side OAuth2 | Same as Word import – uses `/api/content-stats` |
+| **Word document import** | Server-side OAuth2 | XM Cloud Deploy → Credentials → Automation client |
+| **Dashboard, custom field** | Marketplace SDK (session-based) | User's Portal session – no config needed |
 
-For the Word import, we use a **server-side API route** (`/api/create-article`) that calls the Sitecore Authoring GraphQL API directly. This requires an **Automation client** created in XM Cloud Deploy (not Developer Studio). See [08 – Word Import](./08-word-import.md) for the full setup.
+Both the content analytics and Word import use **server-side API routes** that call the Sitecore Authoring GraphQL API with OAuth2. No Content/Preview API access in Developer Studio is required. See [08 – Word Import](./08-word-import.md) for credentials setup.
 
 ---
 

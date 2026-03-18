@@ -57,12 +57,13 @@ The Routing value is the path in your Next.js app. Each `app/<folder>/page.tsx` 
 
 ## Step 5: API Access
 
-Click **Select APIs** and enable:
+Click **Select APIs** and enable **all** of the following that appear in the list:
 
-- **Authoring and Management GraphQL API** – Required for content queries (e.g. search, item by path) and the Word document import feature. Without this, GraphQL returns no data and you'll see "Total Items = 0".
-- **SitecoreAI APIs** – Enable if your app uses AI features.
+- **Content/Preview API** (or **Preview GraphQL API**) – Required for content analytics (Total Items, search). The Pages Context Panel uses `xmc.preview.graphql` to query content. Without this, you'll see "No content found at ... Ensure Content/Preview API access is enabled in Developer Studio."
+- **Authoring and Management GraphQL API** – Required for content management operations. The Word import uses a server-side OAuth2 client (separate from this), but other SDK operations may need it.
+- **SitecoreAI APIs** – Enable if your app uses AI features (includes Authoring and Management GraphQL API, Sites REST API, Pages REST API).
 
-![API access configuration](./assets/api-access-config.png)
+![API access modal with SitecoreAI APIs enabled](./assets/api-access-modal.png)
 
 If you skip this step, the app will load but GraphQL calls will fail or return empty results.
 
