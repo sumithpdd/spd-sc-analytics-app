@@ -14,6 +14,8 @@ A Sitecore Marketplace app that provides a Content Analytics Dashboard for Sitec
 | [04 – Extension Points](./docs/04-extension-points.md) | Standalone, Dashboard Widget, Custom Field |
 | [05 – Register in XM Cloud](./docs/05-register-app.md) | Configure and install the app in Developer Studio |
 | [06 – Project Structure](./docs/06-project-structure.md) | Architecture and key files |
+| [07 – Zero Data](./docs/07-troubleshooting-zero-data.md) | Fix Total Items = 0 |
+| [08 – Word Import](./docs/08-word-import.md) | Import Word docs → ArticlePage in Sitecore |
 
 👉 **[Start with the docs index](./docs/README.md)**
 
@@ -30,12 +32,13 @@ npm run dev
 
 | Route | Purpose |
 |-------|---------|
-| `/standalone` | Full-page Content Analytics Dashboard |
-| `/pages-contextpanel` | **Site-specific analytics** – runs in Pages editor, uses site context |
-| `/dashboard-widget` | Compact approval stats widget |
+| `/standalone` | Full-page Content Analytics Dashboard (Preview API) |
+| `/pages-contextpanel` | **Analytics + Word import** – runs in Pages editor, uses Authoring API |
+| `/import-doc` | Standalone Word document import page |
+| `/dashboard-widget` | Sample approval stats widget |
 | `/custom-field` | Color picker for content editor fields |
 
-**Getting real content data:** The standalone app runs from the Portal and may not have site context. For site-specific stats (e.g. visitlondon), use the **Pages Context Panel** extension from the Pages editor.
+**Getting real content data:** Use the **Pages Context Panel** from the Pages editor – it shows Total Items and Word import via server-side Authoring API (no Preview API needed).
 
 ## Prerequisites
 
@@ -67,6 +70,16 @@ npm run dev
 | SDK initialization fails | Access the app through Cloud Portal, not localhost directly |
 | App doesn't appear in navigation | Ensure the app is Active in Developer Studio and installed from My Apps |
 | Blank screen | Verify the deployment URL matches your route and the dev server is running |
+
+## Deploy to Vercel
+
+Vercel deployment is supported and tested.
+
+1. Push to GitHub and import in [Vercel](https://vercel.com)
+2. Add env vars: `SITECORE_CLIENT_ID`, `SITECORE_CLIENT_SECRET`, `XMC_HOST`, `ARTICLES_FOLDER_ID`
+3. Deploy, then in Developer Studio set Deployment URL to your Vercel URL (base only, e.g. `https://your-app.vercel.app`)
+
+See [docs/README.md#deploy-to-vercel-production](./docs/README.md#deploy-to-vercel-production) for details.
 
 ## Learn More
 

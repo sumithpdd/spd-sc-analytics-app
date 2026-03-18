@@ -4,6 +4,16 @@ This documentation is written for **junior developers** new to Sitecore Marketpl
 
 ---
 
+## Junior developer checklist
+
+1. **Install** – `npm install` then `npm run dev`
+2. **Create env** – Copy `.env.local.example` to `.env.local`, add `SITECORE_CLIENT_ID`, `SITECORE_CLIENT_SECRET`, `XMC_HOST`, `ARTICLES_FOLDER_ID` (see [08 – Word Import](./08-word-import.md))
+3. **Register** – Developer Studio → Create Custom App → Deployment URL `http://localhost:3000` (base only), enable Pages Context Panel + `/pages-contextpanel`
+4. **API Access** – Enable **Authoring and Management GraphQL API** (no Preview API needed for Pages Context Panel)
+5. **Test** – Open from Portal → My Apps → Install → then open Pages editor → context panel
+
+---
+
 ## Quick Start
 
 ```bash
@@ -35,7 +45,7 @@ Before the app can appear in the Portal, you must register it in **Developer Stu
    - **Page context panel:** `/pages-contextpanel` (required for site-specific content data)
    - **Dashboard widgets:** `/dashboard-widget`
    - **Custom field:** `/custom-field`
-5. **API Access:** Click **Select APIs** → enable **Content/Preview API** (for content analytics) and **Authoring and Management GraphQL API**. The Word import uses a server-side OAuth2 Automation client (see [08 – Word Import](./08-word-import.md)), but the content analytics needs Preview API access.
+5. **API Access:** Click **Select APIs** → enable **Authoring and Management GraphQL API**. Content analytics and Word import both use server-side OAuth2 (see [08 – Word Import](./08-word-import.md)) – no Content/Preview API needed for the Pages Context Panel. The **Standalone** dashboard uses the Preview API for site-specific content; enable **Content/Preview API** only if you use that extension.
 6. **Save** → **Activate** → **Install** from My Apps
 
 ![Extension points configuration](./assets/extension-points-config.png)
@@ -98,6 +108,24 @@ For a deeper walkthrough, follow these guides in order:
 - [06 – Project Structure](./06-project-structure.md) – Code layout and key files
 - [07 – Zero Data](./07-troubleshooting-zero-data.md) – Why Total Items = 0 and how to fix it
 - [08 – Word Import](./08-word-import.md) – Import Word documents and create articles in Sitecore
+
+---
+
+---
+
+## Deploy to Vercel (Production)
+
+Vercel deployment is supported and tested. Steps:
+
+1. Push your code to GitHub and import the repo in [Vercel](https://vercel.com).
+2. Add these **Environment Variables** in Vercel → Project → Settings → Environment Variables:
+   - `SITECORE_CLIENT_ID` – Automation client ID from XM Cloud Deploy
+   - `SITECORE_CLIENT_SECRET` – Automation client secret
+   - `XMC_HOST` – Your CM hostname (e.g. `xm-xxx.sitecorecloud.io`)
+   - `ARTICLES_FOLDER_ID` – Articles folder GUID (no braces)
+3. Deploy. Vercel will build and host your app.
+4. In **Developer Studio**, update the app's **Deployment URL** to your Vercel URL (e.g. `https://your-app.vercel.app`). Use the base URL only – no paths.
+5. **Activate** and **Install** the app from My Apps.
 
 ---
 

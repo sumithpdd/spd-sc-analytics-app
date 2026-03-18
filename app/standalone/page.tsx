@@ -273,7 +273,14 @@ export default function AnalyticsDashboard() {
 }
 
 // Helper components
-function StatCard({ title, value, icon, trend, trendUp }: any) {
+interface StatCardProps {
+  title: string;
+  value: string;
+  icon: string;
+  trend: string;
+  trendUp: boolean | null;
+}
+function StatCard({ title, value, icon, trend, trendUp }: StatCardProps) {
   const trendColor = trendUp === true ? "text-green-600" : 
                      trendUp === false ? "text-red-600" : "text-gray-600";
 

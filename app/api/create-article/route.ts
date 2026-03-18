@@ -80,27 +80,23 @@ async function resolveOrCreateAuthor(
     .slice(0, 100)
     .trim();
 
-  // ── 1. List children of Authors folder (correct schema: id arg + nodes) ───
-  type ChildNode = { itemId: string; name: string };
+  // ── 1. List children of Authors folder (templateId used when creating first author) ─
+  type ChildNode = { itemId: string; name: string; templateId?: string };
 
   async function fetchAuthorChildren(): Promise<ChildNode[]> {
     const r = await authoringGql<Record<string, unknown>>(
       token,
       `query ListAuthors($itemId: ID!) {
         item(where: { database: "master", itemId: $itemId }) {
-          itemId
-          name
           children(first: 500) {
-            nodes { itemId name }
+            nodes { itemId name templateId }
           }
         }
       }`,
-      // where.itemId requires raw GUID (no braces)
       { itemId: ITEMS.AuthorsFolder.id }
     );
     const data = r.data as { item?: { children?: { nodes: ChildNode[] } } } | undefined;
-    const nodes = data?.item?.children?.nodes ?? [];
-    return nodes;
+    return data?.item?.children?.nodes ?? [];
   }
 
   const needle = normaliseName(name);
@@ -116,8 +112,12 @@ async function resolveOrCreateAuthor(
   const existing = findInList(children);
   if (existing) return normalizeGuid(existing.itemId);
 
-  // ── 2. Get Author template ID ─────────────────────────────────────────────
-  const authorTemplateId = getAuthorTemplateId([]);
+  // ── 2. Get Author template ID (from env, existing authors, or constants) ───
+  const authorTemplateId = getAuthorTemplateId(
+    children
+      .filter((c) => c.templateId)
+      .map((c) => ({ templateId: c.templateId }))
+  );
 
   // ── 3. Create new Author item ─────────────────────────────────────────────
   const createResult = await authoringGql<{

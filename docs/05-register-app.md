@@ -34,7 +34,7 @@ Do **not** include:
 
 Sitecore appends the extension route automatically. For example, when loading the Standalone extension, it requests `http://localhost:3000/standalone`. If you set the Deployment URL to `http://localhost:3000/standalone`, Sitecore would request `http://localhost:3000/standalone/standalone` for Standalone and `http://localhost:3000/standalone/pages-contextpanel` for the Pages Context Panel—both would 404.
 
-For production, use your deployed app URL (e.g. `https://your-app.vercel.app`).
+For production, use your deployed app URL (e.g. `https://your-app.vercel.app`). Vercel deployment is supported and tested – see [Deploy to Vercel](./README.md#deploy-to-vercel-production) in the docs index.
 
 ---
 
@@ -57,15 +57,14 @@ The Routing value is the path in your Next.js app. Each `app/<folder>/page.tsx` 
 
 ## Step 5: API Access
 
-Click **Select APIs** and enable **all** of the following that appear in the list:
+Click **Select APIs** and enable:
 
-- **Content/Preview API** (or **Preview GraphQL API**) – Required for content analytics (Total Items, search). The Pages Context Panel uses `xmc.preview.graphql` to query content. Without this, you'll see "No content found at ... Ensure Content/Preview API access is enabled in Developer Studio."
-- **Authoring and Management GraphQL API** – Required for content management operations. The Word import uses a server-side OAuth2 client (separate from this), but other SDK operations may need it.
-- **SitecoreAI APIs** – Enable if your app uses AI features (includes Authoring and Management GraphQL API, Sites REST API, Pages REST API).
+- **Authoring and Management GraphQL API** – Required for the **Pages Context Panel** (content stats and Word import use server-side OAuth2, but the app still needs this for SDK operations).
+- **Content/Preview API** – Only needed if you use the **Standalone** dashboard extension. The Pages Context Panel uses `/api/content-stats` (Authoring API) and does **not** require Preview API.
 
 ![API access modal with SitecoreAI APIs enabled](./assets/api-access-modal.png)
 
-If you skip this step, the app will load but GraphQL calls will fail or return empty results.
+**Tip for junior devs:** Start with just **Authoring and Management GraphQL API**. Use the Pages Context Panel from the Pages editor – it shows Total Items and Word import without needing Preview API access.
 
 ---
 

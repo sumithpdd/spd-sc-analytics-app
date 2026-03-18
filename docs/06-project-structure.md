@@ -9,21 +9,29 @@ This guide explains the codebase layout and what each key file does. It's aimed 
 ```
 spd-sc-marketplace-app/
 ├── app/
-│   ├── standalone/           # Full-page dashboard
-│   │   └── page.tsx
-│   ├── pages-contextpanel/   # Site analytics (Pages editor)
-│   │   └── page.tsx
-│   ├── dashboard-widget/     # Dashboard card
-│   │   └── page.tsx
+│   ├── api/
+│   │   ├── create-article/   # POST – Word import (OAuth2 + Authoring API)
+│   │   │   └── route.ts
+│   │   └── content-stats/    # GET – Article count (Authoring API)
+│   │       └── route.ts
+│   ├── standalone/           # Full-page dashboard (Preview API)
+│   ├── pages-contextpanel/   # Analytics + Word import (Authoring API)
+│   ├── import-doc/           # Standalone Word import page
+│   ├── dashboard-widget/     # Sample dashboard card
 │   ├── custom-field/         # Color picker field
-│   │   └── page.tsx
-│   ├── layout.tsx            # Root layout
-│   ├── page.tsx              # Home (redirect or placeholder)
+│   ├── layout.tsx
+│   ├── page.tsx              # Landing page
 │   └── globals.css
+├── components/
+│   └── ArticleUploader.tsx
 ├── hooks/
 │   └── useMarketplaceClient.ts
 ├── lib/
-│   └── xmcClient.ts
+│   ├── authoring-api.ts     # OAuth2 + GraphQL helpers
+│   ├── sitecore-constants.ts # IDs, field names
+│   ├── xmcClient.ts         # Preview API (standalone dashboard)
+│   ├── document-processor.ts
+│   └── article-document-processor.ts
 ├── docs/
 └── package.json
 ```
@@ -34,11 +42,11 @@ spd-sc-marketplace-app/
 
 ### app/standalone/page.tsx
 
-Full-page analytics dashboard. Runs when the user opens the app from the Portal navigation. May not have site context when launched from the main Portal, so it can show org-level or placeholder data. Uses `useMarketplaceClient` and optionally `executeGraphQL` / `searchByContentRoot` from `lib/xmcClient.ts`.
+Full-page analytics dashboard. Runs when the user opens the app from the Portal navigation. Uses `useMarketplaceClient` and `lib/xmcClient.ts` (Preview API) for site-specific content counts. Requires **Content/Preview API** access in Developer Studio. For analytics without Preview API, use the **Pages Context Panel** instead (uses `/api/content-stats`).
 
 ### app/pages-contextpanel/page.tsx
 
-Site-specific analytics panel and **Word document import**. Runs **inside the Pages editor** when the user is editing a page. Subscribes to `pages.context` to get `siteInfo.collectionId` (used as `sitecoreContextId`) and `pageInfo.path`. Derives the content root from the page path and calls `searchByContentRoot` to get item counts. Includes `ArticleUploader` for importing Word docs and creating ArticlePage items. See [08 – Word Import](./08-word-import.md).
+Site-specific analytics panel and **Word document import**. Runs **inside the Pages editor** when the user is editing a page. Fetches stats from `/api/content-stats` (server-side Authoring API – no Preview API needed). Includes `ArticleUploader` for importing Word docs and creating ArticlePage items. See [08 – Word Import](./08-word-import.md).
 
 ### app/dashboard-widget/page.tsx
 
@@ -58,7 +66,7 @@ React hook that initializes the Marketplace SDK and returns `{ client, error, is
 
 ### app/import-doc/page.tsx
 
-Standalone Word document import page. Can be used when the app is opened from the main Portal. Tries to get `sitecoreContextId` from `application.context` or `pages.context`. For best results, use the import from the Pages Context Panel instead.
+Standalone Word document import page. Renders `ArticleUploader` for uploading Word docs. Uses the same server-side `/api/create-article` route as the Pages Context Panel. For best results, use the import from the Pages Context Panel (site context + analytics in one place).
 
 ### components/ArticleUploader.tsx
 
@@ -72,9 +80,13 @@ Parses Word OOXML files. Extracts table rows and paragraphs from `word/document.
 
 Transforms parsed rows into title, date, content, author. Expects: first line = title, second = date (optional), body until "Author" = content, then author name and role.
 
-### lib/article-page-creator.ts
+### lib/authoring-api.ts
 
-Creates ArticlePage items via `xmc.authoring.graphql`. Uses template `{412BF445-B1A6-4AFF-8054-0B21A1FEBC47}` and parent `/sitecore/content/industry-verticals/legal/Home/Articles`.
+Shared helpers for the Sitecore Authoring GraphQL API. Used by `/api/create-article` and `/api/content-stats`. `getBearerToken()` obtains OAuth2 JWT from XM Cloud Deploy credentials. `authoringGql()` runs GraphQL mutations/queries against the Authoring API.
+
+### lib/sitecore-constants.ts
+
+Template IDs, item IDs (Articles folder, Authors folder), and field names. Used by create-article and content-stats routes. Override via `ARTICLES_FOLDER_ID` and `AUTHOR_ITEM_TEMPLATE_ID` env vars.
 
 ### lib/xmcClient.ts
 

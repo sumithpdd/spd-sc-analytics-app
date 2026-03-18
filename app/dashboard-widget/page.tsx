@@ -1,5 +1,9 @@
 "use client";
 
+/**
+ * Dashboard widget – sample approval stats.
+ * Uses mock data; replace with real workflow API when available.
+ */
 import { useMarketplaceClient } from "@/hooks/useMarketplaceClient";
 import { useEffect, useState } from "react";
 
